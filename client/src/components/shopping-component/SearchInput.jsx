@@ -14,6 +14,7 @@ const SearchInput = () => {
 const [searchParams,setSearchParams] = useSearchParams()
   const { user } = useSelector((state) => state.auth);
 const dispatch = useDispatch()
+   const { cartItems } = useSelector((state) => state.shopCart);
 const {searchResult} = useSelector(state=>state.shopSearch)
 const {isAuthenticated} = useSelector((state) => state.auth);
 const [openDialog,setOpenDialog]=useState(false)
@@ -34,21 +35,43 @@ useEffect(() => {
     }
   }, [keyword]);
 
-  function handleAddToCart(getCurrentProductId) {
-    if (!isAuthenticated || !user?.id) {
-      toast.error("Please login to add items to cart.");
-      navigate("/auth/login");
-      return;
-    }
-  
-    dispatch(addToCart({ userId: user.id, productId: getCurrentProductId, quantity: 1 }))
-      .then((data) => {
-        if (data?.payload?.success) {
-          dispatch(fetchCartItems(user.id));
-          toast.success("Add to cart successful!");
-        }
-      });
+function handleAddToCart(getCurrentProductId) {
+  if (!isAuthenticated || !user?.id) {
+    toast.error("Please login to add items to cart.");
+    navigate("/auth/login");
+    return;
   }
+
+  const getCartItems = cartItems.items || [];
+  const currentProduct = productList.find(
+    (product) => product._id === getCurrentProductId
+  );
+
+  const getTotalStock = currentProduct?.totalStock ?? 0;
+
+  if (getCartItems.length) {
+    const indexOfCurrentItem = getCartItems.findIndex(
+      (item) => item.productId === getCurrentProductId
+    );
+    if (indexOfCurrentItem > -1) {
+      const getQuantity = getCartItems[indexOfCurrentItem].quantity;
+      if (getQuantity + 1 > getTotalStock) {
+        toast.error(
+          `Only ${getTotalStock} quantity can be added for this item`,
+        );
+        return;
+      }
+    }
+  }
+
+  dispatch(addToCart({ userId: user.id, productId: getCurrentProductId, quantity: 1 }))
+    .then((data) => {
+      if (data?.payload?.success) {
+        dispatch(fetchCartItems(user.id));
+        toast.success("Add to cart successful!");
+      }
+    });
+}
   
 function handelGetProductDetails(getCurrentProductId){
 

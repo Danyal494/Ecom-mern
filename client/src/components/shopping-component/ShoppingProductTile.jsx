@@ -24,11 +24,15 @@ const ShoppingProductTile = ({ product, handelGetProductDetails,handleAddToCart 
               </Badge>
             ) : null}
 
-          {product?.totalStock > 0 && product?.totalStock < 5 && (
-            <Badge className="absolute top-10 left-2 bg-red-500 hover:bg-red-600">
+{product?.totalStock <= 0 ? (
+  <Badge className="absolute top-10 left-2 bg-gray-500 hover:bg-gray-600">
+    Out of stock
+  </Badge>
+) : product?.totalStock < 5 ? (
+  <Badge className="absolute top-10 left-2 bg-red-500 hover:bg-red-600">
     Only {product.totalStock} left in stock!
   </Badge>
-)}
+) : null}
 
           </div>
 
@@ -59,7 +63,7 @@ const ShoppingProductTile = ({ product, handelGetProductDetails,handleAddToCart 
           </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={()=>handleAddToCart(product?._id)}  disabled={product?.totalStock === 0} className="w-full">   {product?.totalStock === 0 ? "Out of Stock" : "Add to Cart"}</Button>
+          <Button onClick={()=>handleAddToCart(product?._id,product?.totalStock)}  disabled={product?.totalStock <= 0} className="w-full">   {product?.totalStock <= 0 ? "Out of Stock" : "Add to Cart"}</Button>
         </CardFooter>
       </Card>
     </div>

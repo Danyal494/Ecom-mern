@@ -22,12 +22,34 @@ const { user } = useSelector((state) => state.auth);
 const { reviews } = useSelector((state) => state.shopReview);
 const navigate = useNavigate()
 const {isAuthenticated} = useSelector((state) => state.auth);
-function handleAddToCart(getCurrentProductId) {
+const {cartItems} = useSelector((state) => state.shopCart);
+function handleAddToCart(getCurrentProductId,getTotalStock ) {
   if (!isAuthenticated || !user?.id) {
     toast.error("Please login to add items to cart.");
     navigate("/auth/login");
     return;
   }
+
+  
+   
+    let getCartItems = cartItems.items || [];
+  
+    if (getCartItems.length) {
+      const indexOfCurrentItem = getCartItems.findIndex(
+        (item) => item.productId === getCurrentProductId
+      );
+      if (indexOfCurrentItem > -1) {
+        const getQuantity = getCartItems[indexOfCurrentItem].quantity;
+        if (getQuantity + 1 > getTotalStock) {
+          toast.error(
+           `Only ${getQuantity} quantity can be added for this item`,
+          
+          );
+  
+          return;
+        }
+      }
+    }
 
   dispatch(addToCart({ userId: user.id, productId: getCurrentProductId, quantity: 1 }))
     .then((data) => {
@@ -145,7 +167,7 @@ const averageRating = reviews?.length
 
 
           <div className="mt-5 mb-5">
-            <Button onClick={()=>handleAddToCart(productDetail?._id)} className="w-full">Add To Cart</Button>
+             <Button onClick={()=>handleAddToCart(productDetail?._id,productDetail?.totalStock)}  disabled={productDetail?.totalStock <= 0} className="w-full">   {productDetail?.totalStock <= 0 ? "Out of Stock" : "Add to Cart"}</Button>
           </div>
           <Separator className="" />
             <h2 className="text-xl font-bold mb-4">Reviews</h2>

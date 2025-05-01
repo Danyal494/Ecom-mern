@@ -20,6 +20,7 @@ const addToCart = async (req, res) => {
         message: "Product not found",
       });
     }
+    
 
     let cart = await Cart.findOne({ userId });
 

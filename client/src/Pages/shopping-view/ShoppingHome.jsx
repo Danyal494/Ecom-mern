@@ -49,6 +49,7 @@ const ShoppingHome = () => {
 const [currentSlide,setCurrentSlide] = useState(0)
   
   const {isAuthenticated} = useSelector((state) => state.auth);
+   const { cartItems } = useSelector((state) => state.shopCart);
 // const { productList} = useSelector(state => state.shopProducts)
   const { productList , productDetail } = useSelector((state) => state.shopProducts);
   const { featureImageList } = useSelector((state) => state.commonFeature);
@@ -86,21 +87,83 @@ function handleNavigationToListingPage(getCurrentItem,section) {
 dispatch(fetchProductDetail(getCurrentProductId))
   }
 
- function handleAddToCart(getCurrentProductId) {
-   if (!isAuthenticated || !user?.id) {
-     toast.error("Please login to add items to cart.");
-     navigate("/auth/login");
-     return;
-   }
+//  function handleAddToCart(getCurrentProductId) {
+//    if (!isAuthenticated || !user?.id) {
+//      toast.error("Please login to add items to cart.");
+//      navigate("/auth/login");
+//      return;
+//    }
+
+//    let getCartItems = cartItems.items || [];
+   
+//      if (getCartItems.length) {
+//        const indexOfCurrentItem = getCartItems.findIndex(
+//          (item) => item.productId === getCurrentProductId
+//        );
+//        if (indexOfCurrentItem > -1) {
+//          const getQuantity = getCartItems[indexOfCurrentItem].quantity;
+//          if (getQuantity + 1 > getTotalStock) {
+//            toast.error(
+//             `Only ${getQuantity} quantity can be added for this item`,
+           
+//            );
+   
+//            return;
+//          }
+//        }
+//      }
+   
+   
+
  
-   dispatch(addToCart({ userId: user.id, productId: getCurrentProductId, quantity: 1 }))
-     .then((data) => {
-       if (data?.payload?.success) {
-         dispatch(fetchCartItems(user.id));
-         toast.success("Add to cart successful!");
-       }
-     });
- }
+//    dispatch(addToCart({ userId: user.id, productId: getCurrentProductId, quantity: 1 }))
+//      .then((data) => {
+//        if (data?.payload?.success) {
+//          dispatch(fetchCartItems(user.id));
+//          toast.success("Add to cart successful!");
+//        }
+//      });
+//  }
+
+
+function handleAddToCart(getCurrentProductId) {
+  if (!isAuthenticated || !user?.id) {
+    toast.error("Please login to add items to cart.");
+    navigate("/auth/login");
+    return;
+  }
+
+  const getCartItems = cartItems.items || [];
+  const currentProduct = productList.find(
+    (product) => product._id === getCurrentProductId
+  );
+
+  const getTotalStock = currentProduct?.totalStock ?? 0;
+
+  if (getCartItems.length) {
+    const indexOfCurrentItem = getCartItems.findIndex(
+      (item) => item.productId === getCurrentProductId
+    );
+    if (indexOfCurrentItem > -1) {
+      const getQuantity = getCartItems[indexOfCurrentItem].quantity;
+      if (getQuantity + 1 > getTotalStock) {
+        toast.error(
+          `Only ${getTotalStock} quantity can be added for this item`,
+        );
+        return;
+      }
+    }
+  }
+
+  dispatch(addToCart({ userId: user.id, productId: getCurrentProductId, quantity: 1 }))
+    .then((data) => {
+      if (data?.payload?.success) {
+        dispatch(fetchCartItems(user.id));
+        toast.success("Add to cart successful!");
+      }
+    });
+}
+
  
   useEffect(()=>{
   if(productDetail !== null ) setOpenDialog(true)

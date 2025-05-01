@@ -81,7 +81,7 @@ const ShoppingCheckout = () => {
 
     // Your Stripe logic here
     toast.success('Stripe payment selected. Redirecting to payment...');
-    // navigate('/shop/stripe-checkout');
+    navigate('/shop/stripe-checkout');
   };
 
   return (
@@ -120,7 +120,7 @@ const ShoppingCheckout = () => {
           </div>
 
           <div className="mt-4 w-full flex flex-col gap-4">
-            <Button
+            {/* <Button
               variant="outline"
               disabled={!cartItems.items?.length}
               onClick={() => {
@@ -129,7 +129,7 @@ const ShoppingCheckout = () => {
               }}
             >
               Checkout with Card (Stripe)
-            </Button>
+            </Button> */}
 
             <Button
               disabled={!cartItems.items?.length}

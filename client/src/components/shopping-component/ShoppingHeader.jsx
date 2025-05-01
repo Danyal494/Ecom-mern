@@ -61,7 +61,7 @@ function HeaderRightContent() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  console.log(user)
+  // console.log(user)
   function handleLogout() {
     dispatch(logoutUserAction());
   }
